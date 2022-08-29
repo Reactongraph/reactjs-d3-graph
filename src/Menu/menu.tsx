@@ -1,20 +1,7 @@
-import React from "react";
 import "./menu.css";
-import { useQuery } from "react-query";
 
-const getPosts = async () => {
-  console.log(".....");
-  const response = await fetch("https://jsonplaceholder.typicode.com/posts");
-  return response.json();
-};
-
-function Abc(props) {
-  // const { status, data, isFetching, error } = useQuery("posts", getPosts);
-  // console.log("ff", status, data);
-}
-function Menu(props) {
-  const handleChange = (event) => {
-    console.log("..", event.target.id);
+const Menu = (props: {onchange:Function}) => {
+  const handleChange = (event)=> {
     props.onchange(event.target.id);
   };
 
@@ -27,15 +14,19 @@ function Menu(props) {
     "violin chart",
     "area chart",
   ];
-  const aa = chart.map((ele: any) => {
+  const chartGraph = chart.map((ele: string) => {
     return (
-      <div className="spanList" onClick={handleChange} id={ele as any}>
-        {ele as any}
+      <div
+        className="spanList"
+        onClick={handleChange}
+        id={ele as string}
+        key={ele as string}
+      >
+        {ele.toUpperCase() as any}
       </div>
-      // </div>
     );
   });
-  return <div className="menu">{aa}</div>;
-}
+  return <div className="menu">{chartGraph}</div>;
+};
 
 export default Menu;
