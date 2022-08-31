@@ -14,7 +14,7 @@ const Menu = (props: {onchange:Function}) => {
     "violin chart",
     "area chart",
   ];
-  const chartGraph = chart.map((ele: string) => {
+  const ChartGraph = chart.map((ele: string) => {
     return (
       <div
         className="spanList"
@@ -26,7 +26,7 @@ const Menu = (props: {onchange:Function}) => {
       </div>
     );
   });
-  return <div className="menu">{chartGraph}</div>;
+  return <div className="menu">{ChartGraph}</div>;
 };
 
 export default Menu;
