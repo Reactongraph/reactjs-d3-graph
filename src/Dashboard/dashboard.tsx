@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import Menu from "../Menu/menu";
 import * as d3 from "d3";
-// import { useQuery } from "react-query";
-import { QueryClient, QueryClientProvider } from "react-query";
+import { QueryClient } from "react-query";
+import { NumberLiteralType, UnionType } from "typescript";
 const areaChart = async () => {
   d3.select("svg").remove();
   let data = await getData();
@@ -35,7 +35,7 @@ const areaChart = async () => {
     .scaleLinear()
     .domain([
       0,
-      d3.max(data, function (d) {
+      d3.max(data, function (d: any) {
         return +d.value;
       }),
     ])
@@ -51,12 +51,12 @@ const areaChart = async () => {
       "d",
       d3
         .area()
-        .x(function (d) {
+        .x(function (d: {date: String}) {
           return x(d.date);
         })
         .y0(y(0))
-        .y1(function (d) {
-          return y(d.value);
+        .y1(function (d:{value: String}) {
+           return y(d.value);
         })
     );
 };
@@ -86,7 +86,7 @@ const violinChart = async () => {
     .histogram()
     .value(function (d) {
       return d.value;
-    }) // I need to give the vector of value
+    }) // I need to give the vector oanyf value
     .domain(x.domain()) // then the domain of the graphic
     .thresholds(x.ticks(20)); // then the numbers of bins
 
@@ -97,7 +97,7 @@ const violinChart = async () => {
   var y = d3.scaleLinear().range([height, 0]);
   y.domain([
     0,
-    d3.max(data, function (d) {
+    d3.max(data, function (d: {value: String}) {
       return +d.value;
     }),
   ]);
@@ -110,13 +110,13 @@ const violinChart = async () => {
     .enter()
     .append("rect")
     .attr("x", 1)
-    .attr("transform", function (d) {
+    .attr("transform", function (d: {x0: Number, length: Number }) {
       return "translate(" + x(d.x0) + "," + y(d.length) + ")";
     })
-    .attr("width", function (d) {
+    .attr("width", function (d: {x1: Number, x0: Number}) {
       return x(d.x1) - x(d.x0) - 1;
     })
-    .attr("height", function (d) {
+    .attr("height", function (d: {length: Number}) {
       return height - y(d.length);
     })
     .style("fill", "#69b3a2");
@@ -167,10 +167,10 @@ const drawLineChart = async () => {
       "d",
       d3
         .line()
-        .x(function (d) {
+        .x(function (d:{date: String}) {
           return x(d.date);
         })
-        .y(function (d) {
+        .y(function (d:{value: String}) {
           return y(d.value);
         })
     );
@@ -216,10 +216,10 @@ const scatterplot = async () => {
     .data(data)
     .enter()
     .append("circle")
-    .attr("cx", function (d) {
+    .attr("cx", function (d:{date: String}) {
       return x(d.date);
     })
-    .attr("cy", function (d) {
+    .attr("cy", function (d:{value: String}) {
       return y(d.value);
     })
     .attr("r", 1.5)
@@ -275,20 +275,20 @@ const heatMap = async () => {
 
   svg
     .selectAll()
-    .data(data, function (d) {
+    .data(data, function (d:{value: String,date: String}) {
       return d.date + ":" + d.value;
     })
     .enter()
     .append("rect")
-    .attr("x", function (d) {
+    .attr("x", function (d:{date: String}) {
       return x(d.date);
     })
-    .attr("y", function (d) {
+    .attr("y", function (d:{value: String}) {
       return y(d.value);
     })
     .attr("width", x.bandwidth())
     .attr("height", y.bandwidth())
-    .style("fill", function (d) {
+    .style("fill", function (d:{value: String}) {
       return myColor(d.value);
     });
 };
@@ -349,7 +349,7 @@ const drawLollipopChart = async () => {
     .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(x))
     .selectAll("text")
-    .attr("transform", "translate(-10,0)rotate(-45)")
+    .attr("transform", "translate( 0,0)rotate(-45)")
     .style("text-anchor", "end");
 
   // Add Y axis
@@ -362,13 +362,13 @@ const drawLollipopChart = async () => {
     .data(data)
     .enter()
     .append("line")
-    .attr("x1", function (d) {
+    .attr("x1", function (d:{date: String}) {
       return x(d.date);
     })
-    .attr("x2", function (d) {
+    .attr("x2", function (d:{date: String}) {
       return x(d.date);
     })
-    .attr("y1", function (d) {
+    .attr("y1", function (d:{value: String}) {
       return y(d.value);
     })
     .attr("y2", y(0))
@@ -380,10 +380,10 @@ const drawLollipopChart = async () => {
     .data(data)
     .enter()
     .append("circle")
-    .attr("cx", function (d) {
+    .attr("cx", function (d:{date: String}) {
       return x(d.date);
     })
-    .attr("cy", function (d) {
+    .attr("cy", function (d:{value: String}) {
       return y(d.value);
     })
     .attr("r", "4")
@@ -426,18 +426,18 @@ function Dashboard() {
       .selectAll("rect")
       .data(data.sort((a, b) => d3.descending(a.value, b.value)))
       .join("rect")
-      .attr("x", (d, i) => x(i))
-      .attr("y", (d) => y(d.value))
-      .attr("height", (d) => y(0) - y(d.value))
+      .attr("x", (d: String, i: Number) => x(i))
+      .attr("y", (d:{value: String}) => y(d.value))
+      .attr("height", (d:{value: String}) => y(0) - y(d.value))
       .attr("width", x.bandwidth());
 
-    function xAaxis(g) {
+    function xAaxis(g:{attr: any}) {
       g.attr("transform", `translate(0, ${280})`).call(
-        d3.axisBottom(x).tickFormat((i) => data[i].date)
+        d3.axisBottom(x).tickFormat((i:any) => data[i].date)
       );
     }
 
-    function yAaxis(g) {
+    function yAaxis(g: any) {
       g.attr("transform", `translate(${margin.left},0)`).call(
         d3.axisLeft(y).ticks(null)
       );
